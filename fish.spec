@@ -1,7 +1,9 @@
+%define rel 1
+
 Summary:                A friendly interactive shell
 Name:                   fish
-Version:                1.21.5
-Release:                %mkrel 1
+Version:                1.22.3
+Release:                %mkrel %rel
 License:                GPL
 Group:                  Shells
 URL:                    http://roo.no-ip.org/fish/
@@ -47,5 +49,5 @@ rm -rf $RPM_BUILD_ROOT
 %_bindir/*
 %_datadir/%name
 %config(noreplace) %_sysconfdir/fish
-%config(noreplace) %_sysconfdir/fish_inputrc
-%config(noreplace) %_sysconfdir/fish.d
+#%config(noreplace) %_sysconfdir/fish_inputrc
+#%config(noreplace) %_sysconfdir/fish.d
