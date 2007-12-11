@@ -44,7 +44,7 @@ rm -rf $RPM_BUILD_ROOT
 
 %files -f %{name}.lang
 %defattr(-,root,root,-)
-%doc user_doc/html/* ChangeLog 
+%doc user_doc/html/*
 %_mandir/man1/*
 %_bindir/*
 %_datadir/%name
