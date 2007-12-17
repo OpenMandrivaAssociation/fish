@@ -8,7 +8,6 @@ License:                GPL
 Group:                  Shells
 URL:                    http://roo.no-ip.org/fish/
 Source0:                http://roo.no-ip.org/%{name}/files/%{version}/%{name}-%{version}.tar.bz2
-BuildRoot:              %{_tmppath}/%{name}-%{version}-%{release}
 BuildRequires:          doxygen ncurses-devel X11-devel
 Requires(post):         rpm-helper
 Requires(postun):       rpm-helper
