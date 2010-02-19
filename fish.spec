@@ -1,13 +1,13 @@
-%define rel 2
+%define rel 3
 
 Summary:                A friendly interactive shell
 Name:                   fish
 Version:                1.23.0
 Release:                %mkrel %rel
-License:                GPL
+License:                GPLv2
 Group:                  Shells
-URL:                    http://roo.no-ip.org/fish/
-Source0:                http://roo.no-ip.org/%{name}/files/%{version}/%{name}-%{version}.tar.bz2
+URL:                    https://sourceforge.net/projects/fish/
+Source0:                https://sourceforge.net/projects/fish/%{name}-%{version}.tar.bz2
 Patch0:                 fish-1.23.0-ARG_MAX.patch
 BuildRoot:              %{_tmppath}/%{name}-%{version}-%{release}
 BuildRequires:          doxygen ncurses-devel X11-devel
