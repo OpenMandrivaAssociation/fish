@@ -1,8 +1,8 @@
-%define rel 3
+%define rel	1 
 
 Summary:                A friendly interactive shell
 Name:                   fish
-Version:                1.23.0
+Version:                1.23.1
 Release:                %mkrel %rel
 License:                GPLv2
 Group:                  Shells
@@ -26,7 +26,7 @@ is simple but incompatible with other shell languages.
 %patch0 -p1 -b .ARG_MAX
 
 %build
-%configure
+%configure2_5x
 %make
 
 %install
@@ -51,5 +51,4 @@ rm -rf $RPM_BUILD_ROOT
 %_bindir/*
 %_datadir/%name
 %config(noreplace) %_sysconfdir/fish
-#%config(noreplace) %_sysconfdir/fish_inputrc
-#%config(noreplace) %_sysconfdir/fish.d
+%{_docdir}/*
