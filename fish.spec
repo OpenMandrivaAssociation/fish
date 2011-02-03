@@ -1,16 +1,14 @@
-%define rel	1 
-
 Summary:                A friendly interactive shell
 Name:                   fish
 Version:                1.23.1
-Release:                %mkrel %rel
+Release:                %mkrel 2
 License:                GPLv2
 Group:                  Shells
 URL:                    https://sourceforge.net/projects/fish/
 Source0:                https://sourceforge.net/projects/fish/%{name}-%{version}.tar.bz2
 Patch0:                 fish-1.23.0-ARG_MAX.patch
 BuildRoot:              %{_tmppath}/%{name}-%{version}-%{release}
-BuildRequires:          doxygen ncurses-devel X11-devel
+BuildRequires:          doxygen ncurses-devel
 Requires(post):         rpm-helper
 Requires(postun):       rpm-helper
 # for some function in fish configfile, like max_width, etc
@@ -26,12 +24,12 @@ is simple but incompatible with other shell languages.
 %patch0 -p1 -b .ARG_MAX
 
 %build
-%configure2_5x
+%configure2_5x --without-xsel
 %make
 
 %install
 rm -rf $RPM_BUILD_ROOT
-make install DESTDIR="$RPM_BUILD_ROOT"
+%makeinstall_std
 
 rm -Rf $RPM_BUILD_ROOT/usr/share/doc/fish/
 %find_lang %{name}
