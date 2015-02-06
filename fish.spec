@@ -1,7 +1,7 @@
 Summary:                A friendly interactive shell
 Name:                   fish
 Version:                1.23.1
-Release:                %mkrel 2
+Release:                3
 License:                GPLv2
 Group:                  Shells
 URL:                    https://sourceforge.net/projects/fish/
