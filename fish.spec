@@ -51,7 +51,7 @@ nothing to learn or configure.
 %setup -q
 
 %build
-cmake . -DCMAKE_INSTALL_PREFIX=%{_prefix} -DCMAKE_INSTALL_SYSCONFDIR=%{_sysconfdir}
+cmake -E env CXXFLAGS="-Wno-narrowing" cmake . -DCMAKE_INSTALL_PREFIX=%{_prefix} -DCMAKE_INSTALL_SYSCONFDIR=%{_sysconfdir}
 %make_build
 
 %install
