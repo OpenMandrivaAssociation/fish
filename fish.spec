@@ -1,3 +1,5 @@
+%define debug_package %{nil}
+
 Summary:                A friendly interactive shell
 Name:                   fish
 Version:               	3.0.2
@@ -64,23 +66,13 @@ cp -a CONTRIBUTING.md %{buildroot}%{_docdir}
 %find_lang %{name}
 
 %post
-if [ "$1" = 1 ]; then
-  if [ ! -f %{_sysconfdir}/shells ] ; then
-    echo "%{_bindir}/fish" > %{_sysconfdir}/shells
-    echo "/bin/fish" >> %{_sysconfdir}/shells
-  else
-    grep -q "^%{_bindir}/fish$" %{_sysconfdir}/shells || echo "%{_bindir}/fish" >> %{_sysconfdir}/shells
-    grep -q "^/bin/fish$" %{_sysconfdir}/shells || echo "/bin/fish" >> %{_sysconfdir}/shells
-  fi
-fi
+/usr/share/rpm-helper/add-shell %name $1 %{_bindir}/fish
 
 %postun
-if [ "$1" = 0 ] && [ -f %{_sysconfdir}/shells ] ; then
-  sed -i '\!^%{_bindir}/fish$!d' %{_sysconfdir}/shells
-  sed -i '\!^/bin/fish$!d' %{_sysconfdir}/shells
-fi
+/usr/share/rpm-helper/del-shell %name $1 %{_bindir}/fish
 
 %files -f %{name}.lang
+%defattr(-,root,root,-)
 %license COPYING
 %{_mandir}/man1/fish*.1*
 %{_bindir}/fish*
