@@ -1,55 +1,84 @@
+%define debug_package %{nil}
+
 Summary:                A friendly interactive shell
 Name:                   fish
-Version:                1.23.1
+Version:               	3.0.2
 Release:                3
-License:                GPLv2
+
+# GPLv2
+#   - src/fish.cpp
+#   and rest..
+# GPLv2+
+#   - src/builtin_printf.cpp
+# BSD
+#   - share/tools/create_manpage_completions.py
+# ISC
+#   - src/utf8.cpp
+#   - src/utf8.h
+# LGPLv2+
+#   - src/wgetopt.c
+#   - src/wgetopt.h
+# MIT
+#   - share/completions/grunt.fish
+#   - share/tools/web_config/js/angular-sanitize.js
+#   - share/tools/web_config/js/angular.js
+License:                GPLv2 and BSD and ISC and LGPLv2+ and MIT
 Group:                  Shells
-URL:                    https://sourceforge.net/projects/fish/
-Source0:                https://sourceforge.net/projects/fish/%{name}-%{version}.tar.bz2
-Patch0:                 fish-1.23.0-ARG_MAX.patch
+URL:			https://github.com/fish-shell/fish-shell/
+Source0:                https://github.com/fish-shell/fish-shell/releases/download/%{version}/%{name}-%{version}.tar.gz
 BuildRoot:              %{_tmppath}/%{name}-%{version}-%{release}
-BuildRequires:          doxygen ncurses-devel
-Requires(post):         rpm-helper
-Requires(postun):       rpm-helper
-# for some function in fish configfile, like max_width, etc
-Requires:               bc
+BuildRequires:  	cmake >= 3.2
+BuildRequires:  	gcc
+BuildRequires:  	gcc-c++
+BuildRequires:  	gettext
+BuildRequires:  	doxygen
+BuildRequires:  	ncurses-devel
+BuildRequires:  	pkgconfig(libpcre2-8)
+BuildRequires:  	python3-devel
+
+# tab completion wants man-db
+Recommends:     	man-db
+Recommends:     	man-pages
+Recommends:     	groff-base
 
 %description
-fish is a shell geared towards interactive use. It's features are
-focused on user friendlieness and discoverability. The language syntax
-is simple but incompatible with other shell languages.
+fish is a fully-equipped command line shell (like bash or zsh) that is
+smart and user-friendly. fish supports powerful features like syntax
+highlighting, autosuggestions, and tab completions that just work, with
+nothing to learn or configure.
 
 %prep
 %setup -q
-%patch0 -p1 -b .ARG_MAX
 
 %build
-%configure2_5x --without-xsel
-%make
+cmake . -DCMAKE_INSTALL_PREFIX=%{_prefix} -DCMAKE_INSTALL_SYSCONFDIR=%{_sysconfdir}
+%make_build
 
 %install
-rm -rf $RPM_BUILD_ROOT
-%makeinstall_std
+%make_install
 
-rm -Rf $RPM_BUILD_ROOT/usr/share/doc/fish/
+# Install docs from tarball root
+cp -a README.md %{buildroot}%{_docdir}
+cp -a CONTRIBUTING.md %{buildroot}%{_docdir}
+
+
 %find_lang %{name}
-%clean
-rm -rf $RPM_BUILD_ROOT
 
 %post
-/usr/share/rpm-helper/add-shell %name $1 %_bindir/fish
+/usr/share/rpm-helper/add-shell %name $1 %{_bindir}/fish
 
 %postun
-/usr/share/rpm-helper/del-shell %name $1 %_bindir/fish
+/usr/share/rpm-helper/del-shell %name $1 %{_bindir}/fish
 
 %files -f %{name}.lang
 %defattr(-,root,root,-)
-%doc user_doc/html/*
-%_mandir/man1/*
-%_bindir/*
-%_datadir/%name
-%config(noreplace) %_sysconfdir/fish
-%{_docdir}/*
+%license COPYING
+%{_mandir}/man1/fish*.1*
+%{_bindir}/fish*
+%config(noreplace) %{_sysconfdir}/fish/
+%{_datadir}/fish/
+%{_datadir}/pkgconfig/fish.pc
+%{_docdir}
 
 
 %changelog
