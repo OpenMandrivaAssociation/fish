@@ -28,7 +28,6 @@ URL:			https://github.com/fish-shell/fish-shell/
 Source0:                https://github.com/fish-shell/fish-shell/releases/download/%{version}/%{name}-%{version}.tar.gz
 BuildRoot:              %{_tmppath}/%{name}-%{version}-%{release}
 BuildRequires:  	cmake >= 3.2
-BuildRequires:  	ninja
 BuildRequires:  	gcc
 BuildRequires:  	gcc-c++
 BuildRequires:  	gettext
