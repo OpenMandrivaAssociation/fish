@@ -2,39 +2,19 @@
 
 Summary:                A friendly interactive shell
 Name:                   fish
-Version:               	3.0.2
-Release:                3
-
-# GPLv2
-#   - src/fish.cpp
-#   and rest..
-# GPLv2+
-#   - src/builtin_printf.cpp
-# BSD
-#   - share/tools/create_manpage_completions.py
-# ISC
-#   - src/utf8.cpp
-#   - src/utf8.h
-# LGPLv2+
-#   - src/wgetopt.c
-#   - src/wgetopt.h
-# MIT
-#   - share/completions/grunt.fish
-#   - share/tools/web_config/js/angular-sanitize.js
-#   - share/tools/web_config/js/angular.js
+Version:               	3.1.2
+Release:                1
 License:                GPLv2 and BSD and ISC and LGPLv2+ and MIT
 Group:                  Shells
 URL:			https://github.com/fish-shell/fish-shell/
 Source0:                https://github.com/fish-shell/fish-shell/releases/download/%{version}/%{name}-%{version}.tar.gz
 BuildRoot:              %{_tmppath}/%{name}-%{version}-%{release}
-BuildRequires:  	cmake >= 3.2
-BuildRequires:  	gcc
-BuildRequires:  	gcc-c++
+BuildRequires:  	cmake
 BuildRequires:  	gettext
 BuildRequires:  	doxygen
-BuildRequires:  	ncurses-devel
+BuildRequires:  	pkgconfig(ncurses)
 BuildRequires:  	pkgconfig(libpcre2-8)
-BuildRequires:  	python3-devel
+BuildRequires:  	pkgconfig(python)
 
 # tab completion wants man-db
 Recommends:     	man-db
