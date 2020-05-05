@@ -2,7 +2,7 @@
 
 Summary:                A friendly interactive shell
 Name:                   fish
-Version:               	3.1.0
+Version:               	3.1.2
 Release:                1
 License:                GPLv2 and BSD and ISC and LGPLv2+ and MIT
 Group:                  Shells
@@ -14,7 +14,7 @@ BuildRequires:  	gettext
 BuildRequires:  	doxygen
 BuildRequires:  	pkgconfig(ncurses)
 BuildRequires:  	pkgconfig(libpcre2-8)
-BuildRequires:  	pkgconfig(python3)
+BuildRequires:  	pkgconfig(python)
 
 # tab completion wants man-db
 Recommends:     	man-db
