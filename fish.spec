@@ -12,6 +12,7 @@ BuildRoot:              %{_tmppath}/%{name}-%{version}-%{release}
 BuildRequires:  	cmake
 BuildRequires:  	gettext
 BuildRequires:  	doxygen
+BuildRequires:    atomic-devel
 BuildRequires:  	pkgconfig(ncurses)
 BuildRequires:  	pkgconfig(libpcre2-8)
 BuildRequires:  	pkgconfig(python)
