@@ -39,7 +39,7 @@ cmake -E env CXXFLAGS="-Wno-narrowing" cmake . -DCMAKE_INSTALL_PREFIX=%{_prefix}
 %make_install
 
 # Install docs from tarball root
-cp -a README.md %{buildroot}%{_docdir}
+cp -a README.rst %{buildroot}%{_docdir}
 cp -a CONTRIBUTING.md %{buildroot}%{_docdir}
 
 
