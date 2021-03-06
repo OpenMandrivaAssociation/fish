@@ -59,6 +59,8 @@ cp -a CONTRIBUTING.rst %{buildroot}%{_docdir}
 %config(noreplace) %{_sysconfdir}/fish/
 %{_datadir}/fish/
 %{_datadir}/pkgconfig/fish.pc
+%{_datadir}/applications/fish.desktop
+%{_datadir}/pixmaps/fish.png
 %{_docdir}
 
 
