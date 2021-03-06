@@ -2,12 +2,12 @@
 
 Summary:                A friendly interactive shell
 Name:                   fish
-Version:               	3.1.2
+Version:               	3.2.0
 Release:                1
 License:                GPLv2 and BSD and ISC and LGPLv2+ and MIT
 Group:                  Shells
 URL:			https://github.com/fish-shell/fish-shell/
-Source0:                https://github.com/fish-shell/fish-shell/releases/download/%{version}/%{name}-%{version}.tar.gz
+Source0:                https://github.com/fish-shell/fish-shell/releases/download/%{version}/%{name}-%{version}.tar.xz
 BuildRoot:              %{_tmppath}/%{name}-%{version}-%{release}
 BuildRequires:  	cmake
 BuildRequires:  	gettext
