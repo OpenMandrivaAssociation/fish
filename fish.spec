@@ -2,20 +2,20 @@
 
 Summary:                A friendly interactive shell
 Name:                   fish
-Version:               	3.2.0
+Version:               	3.2.1
 Release:                1
 License:                GPLv2 and BSD and ISC and LGPLv2+ and MIT
 Group:                  Shells
 URL:			https://github.com/fish-shell/fish-shell/
 Source0:                https://github.com/fish-shell/fish-shell/releases/download/%{version}/%{name}-%{version}.tar.xz
 BuildRoot:              %{_tmppath}/%{name}-%{version}-%{release}
-BuildRequires:  	cmake
-BuildRequires:  	gettext
-BuildRequires:  	doxygen
-BuildRequires:    atomic-devel
-BuildRequires:  	pkgconfig(ncurses)
-BuildRequires:  	pkgconfig(libpcre2-8)
-BuildRequires:  	pkgconfig(python)
+BuildRequires:  cmake
+BuildRequires:  gettext
+BuildRequires:  doxygen
+BuildRequires:  atomic-devel
+BuildRequires:  pkgconfig(ncurses)
+BuildRequires:  pkgconfig(libpcre2-8)
+BuildRequires:  pkgconfig(python)
 
 # tab completion wants man-db
 Recommends:     	man-db
