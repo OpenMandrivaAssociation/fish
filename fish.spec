@@ -2,7 +2,7 @@
 
 Summary:                A friendly interactive shell
 Name:                   fish
-Version:               	3.5.1
+Version:               	3.6.0
 Release:                1
 License:                GPLv2 and BSD and ISC and LGPLv2+ and MIT
 Group:                  Shells
