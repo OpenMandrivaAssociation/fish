@@ -12,7 +12,7 @@ BuildRoot:              %{_tmppath}/%{name}-%{version}-%{release}
 BuildRequires:  cmake
 BuildRequires:  gettext
 BuildRequires:  doxygen
-BuildRequires:  rust
+BuildRequires:  rust-packaging
 BuildRequires:  atomic-devel
 BuildRequires:  pkgconfig(ncurses)
 BuildRequires:  pkgconfig(libpcre2-8)
