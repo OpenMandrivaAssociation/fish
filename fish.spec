@@ -8,11 +8,13 @@ License:                GPLv2 and BSD and ISC and LGPLv2+ and MIT
 Group:                  Shells
 URL:			https://github.com/fish-shell/fish-shell/
 Source0:                https://github.com/fish-shell/fish-shell/releases/download/%{version}/%{name}-%{version}.tar.xz
+Source1:                %{name}-%{version}-vendor.tar.gz
 BuildRoot:              %{_tmppath}/%{name}-%{version}-%{release}
 BuildRequires:  cmake
 BuildRequires:  gettext
 BuildRequires:  doxygen
 BuildRequires:  atomic-devel
+BuildRequires:  cargo
 BuildRequires:  pkgconfig(ncurses)
 BuildRequires:  pkgconfig(libpcre2-8)
 BuildRequires:  pkgconfig(python)
@@ -30,6 +32,20 @@ nothing to learn or configure.
 
 %prep
 %setup -q
+tar -zxf %{SOURCE1}
+mkdir -p .cargo
+cat >> .cargo/config.toml << EOF
+[source.crates-io]
+replace-with = "vendored-sources"
+
+[source."git+https://github.com/fish-shell/rust-pcre2?tag=0.2.9-utf32"]
+git = "https://github.com/fish-shell/rust-pcre2"
+tag = "0.2.9-utf32"
+replace-with = "vendored-sources"
+
+[source.vendored-sources]
+directory = "vendor"
+EOF
 
 %build
 cmake -E env CXXFLAGS="-Wno-narrowing" cmake . -DCMAKE_INSTALL_PREFIX=%{_prefix} -DCMAKE_INSTALL_SYSCONFDIR=%{_sysconfdir}
