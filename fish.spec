@@ -1,26 +1,48 @@
 %define _empty_manifest_terminate_build 0
+# building with tests enabled
+%bcond_without tests
 
-Summary:                A friendly interactive shell
-Name:                   fish
-Version:               	4.0.2
-Release:                1
-License:                GPLv2 and BSD and ISC and LGPLv2+ and MIT
-Group:                  Shells
-URL:			https://github.com/fish-shell/fish-shell/
-Source0:                https://github.com/fish-shell/fish-shell/releases/download/%{version}/%{name}-%{version}.tar.xz
-BuildRoot:              %{_tmppath}/%{name}-%{version}-%{release}
-BuildRequires:  cmake
-BuildRequires:  gettext
-BuildRequires:  doxygen
-BuildRequires:  atomic-devel
-BuildRequires:  pkgconfig(ncurses)
-BuildRequires:  pkgconfig(libpcre2-8)
-BuildRequires:  pkgconfig(python)
+Summary:	A friendly interactive shell
+Name:		fish
+Version:	4.0.2
+Release:	1
+License:	GPLv2 and BSD and ISC and LGPLv2+ and MIT
+Group:		Shells
+URL:		https://github.com/fish-shell/fish-shell/
+Source0:	https://github.com/fish-shell/fish-shell/releases/download/%{version}/%{name}-%{version}.tar.xz
+Source1:	%{name}-%{version}-vendor.tar.gz
 
+BuildRoot:	%{_tmppath}/%{name}-%{version}-%{release}
+BuildRequires:	cmake
+BuildRequires:	gettext
+BuildRequires:	doxygen
+BuildRequires:	atomic-devel
+BuildRequires:	cargo
+BuildRequires:	pkgconfig(ncurses)
+BuildRequires:	pkgconfig(libpcre2-8)
+BuildRequires:	pkgconfig(python)
+%if %{with tests}
+# tests/checks/jobs.fish requires bg and fg provided by bash/sh
+# and tools from coreutils
+BuildRequires:	bash
+BuildRequires:	coreutils
+# for tests/check/git.fish
+BuildRequires:	git
+# for tests/check/mux-multiline-prompt.fish also requires coreutils
+BuildRequires:	grep
+BuildRequires:	less
+# for tests/checks/locale-numeric.fish
+BuildRequires:	locales
+BuildRequires:	locales-en
+BuildRequires:	locales-fr
+# tests/check/jobs.fish requires ps from procps-ng
+BuildRequires:	procps-ng
+BuildRequires:	tmux
+%endif
 # tab completion wants man-db
-Recommends:     	man-db
-Recommends:     	man-pages
-Recommends:     	groff-base
+Recommends:	man-db
+Recommends:	man-pages
+Recommends:	groff-base
 
 %description
 fish is a fully-equipped command line shell (like bash or zsh) that is
@@ -30,20 +52,56 @@ nothing to learn or configure.
 
 %prep
 %setup -q
+tar -zxf %{SOURCE1}
+mkdir -p .cargo
+cat >> .cargo/config.toml << EOF
+[source.crates-io]
+replace-with = "vendored-sources"
+
+[source."git+https://github.com/fish-shell/rust-pcre2?tag=0.2.9-utf32"]
+git = "https://github.com/fish-shell/rust-pcre2"
+tag = "0.2.9-utf32"
+replace-with = "vendored-sources"
+
+[source.vendored-sources]
+directory = "vendor"
+EOF
+
+# make a build dir to build out of source
+mkdir -p build/
+
+# NOTE Remove flaky tests, these run successfully in local builds but fail on
+# NOTE the ABF, possibly due to the terminal emulation type used in our build
+# NOTE environment.
+# NOTE Upstream appear to be revising their testing set up to more universally
+# NOTE support CI type environments, this may need a revisit for the next
+# NOTE release of fish (> 4.0.2).
+rm -f tests/checks/jobs.fish
+rm -f tests/checks/string.fish
+rm -f tests/checks/tmux-multiline-prompt.fish
+
 
 %build
-cmake -E env CXXFLAGS="-Wno-narrowing" cmake . -DCMAKE_INSTALL_PREFIX=%{_prefix} -DCMAKE_INSTALL_SYSCONFDIR=%{_sysconfdir}
-%make_build
+cmake -E env CXXFLAGS="-Wno-narrowing" \
+cmake -B ./build \
+	-DCMAKE_INSTALL_PREFIX=%{_prefix} \
+	-DCMAKE_INSTALL_SYSCONFDIR=%{_sysconfdir} \
+	-G Ninja
+%ninja_build -C build
 
 %install
-%make_install
+%ninja_install -C build -v
 
 # Install docs from tarball root
 cp -a README.rst %{buildroot}%{_docdir}
 cp -a CONTRIBUTING.rst %{buildroot}%{_docdir}
 
-
 %find_lang %{name}
+
+%if %{with tests}
+%check
+%ninja -C build fish_run_tests -v
+%endif
 
 %post
 /usr/share/rpm-helper/add-shell %name $1 %{_bindir}/fish
@@ -100,8 +158,6 @@ cp -a CONTRIBUTING.rst %{buildroot}%{_docdir}
 - update to 1.22.3
 - Import fish
 
-
-
 * Sun Apr 30 2006 Michael Scherer <misc@mandriva.org> 1.21.5-1mdk
 - New release 1.21.5
 
@@ -118,5 +174,5 @@ cp -a CONTRIBUTING.rst %{buildroot}%{_docdir}
 - New release 1.19.0
 
 * Tue Dec 20 2005 Michael Scherer <misc@mandriva.org> 1.18.2-1mdk
-- first mandriva package, upon rgs request ( happy christmas to you ), 
+- first mandriva package, upon rgs request ( happy christmas to you ),
   based on Axel Liljencrantz <axel@liljencrantz.se> spec.
