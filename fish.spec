@@ -10,7 +10,7 @@ License:	GPLv2 and BSD and ISC and LGPLv2+ and MIT
 Group:		Shells
 URL:		https://github.com/fish-shell/fish-shell/
 Source0:	https://github.com/fish-shell/fish-shell/releases/download/%{version}/%{name}-%{version}.tar.xz
-Source1:	%{name}-%{version}-vendor.tar.gz
+Source1:	vendor.tar.xz
 
 BuildRoot:	%{_tmppath}/%{name}-%{version}-%{release}
 BuildRequires:	cmake
