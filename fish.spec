@@ -4,13 +4,13 @@
 
 Summary:	A friendly interactive shell
 Name:		fish
-Version:	4.0.2
+Version:	4.1.2
 Release:	1
 License:	GPLv2 and BSD and ISC and LGPLv2+ and MIT
 Group:		Shells
 URL:		https://github.com/fish-shell/fish-shell/
 Source0:	https://github.com/fish-shell/fish-shell/releases/download/%{version}/%{name}-%{version}.tar.xz
-Source1:	%{name}-%{version}-vendor.tar.gz
+Source1:	vendor.tar.xz
 
 BuildRoot:	%{_tmppath}/%{name}-%{version}-%{release}
 BuildRequires:	cmake
@@ -96,7 +96,7 @@ cmake -B ./build \
 cp -a README.rst %{buildroot}%{_docdir}
 cp -a CONTRIBUTING.rst %{buildroot}%{_docdir}
 
-%find_lang %{name}
+#find_lang %{name}
 
 %if %{with tests}
 %check
@@ -109,7 +109,8 @@ cp -a CONTRIBUTING.rst %{buildroot}%{_docdir}
 %postun
 /usr/share/rpm-helper/del-shell %name $1 %{_bindir}/fish
 
-%files -f %{name}.lang
+%files 
+#-f %{name}.lang
 %defattr(-,root,root,-)
 %license COPYING
 %{_mandir}/man1/fish*.1*
@@ -117,8 +118,8 @@ cp -a CONTRIBUTING.rst %{buildroot}%{_docdir}
 %config(noreplace) %{_sysconfdir}/fish/
 %{_datadir}/fish/
 %{_datadir}/pkgconfig/fish.pc
-%{_datadir}/applications/fish.desktop
-%{_datadir}/pixmaps/fish.png
+#{_datadir}/applications/fish.desktop
+#{_datadir}/pixmaps/fish.png
 %{_docdir}
 
 
