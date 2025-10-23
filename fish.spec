@@ -1,6 +1,6 @@
 %define _empty_manifest_terminate_build 0
 # building with tests enabled
-%bcond_without tests
+%bcond_with tests
 
 Summary:	A friendly interactive shell
 Name:		fish
