@@ -96,7 +96,7 @@ cmake -B ./build \
 cp -a README.rst %{buildroot}%{_docdir}
 cp -a CONTRIBUTING.rst %{buildroot}%{_docdir}
 
-%find_lang %{name}
+#find_lang %{name}
 
 %if %{with tests}
 %check
@@ -109,7 +109,8 @@ cp -a CONTRIBUTING.rst %{buildroot}%{_docdir}
 %postun
 /usr/share/rpm-helper/del-shell %name $1 %{_bindir}/fish
 
-%files -f %{name}.lang
+%files 
+#-f %{name}.lang
 %defattr(-,root,root,-)
 %license COPYING
 %{_mandir}/man1/fish*.1*
