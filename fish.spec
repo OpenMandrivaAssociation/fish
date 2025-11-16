@@ -1,27 +1,33 @@
 %define _empty_manifest_terminate_build 0
 # building with tests enabled
-%bcond_with tests
+%bcond_without tests
 
 Summary:	A friendly interactive shell
 Name:		fish
-Version:	4.1.2
+Version:	4.2.1
 Release:	1
 License:	GPLv2 and BSD and ISC and LGPLv2+ and MIT
 Group:		Shells
 URL:		https://github.com/fish-shell/fish-shell/
 Source0:	https://github.com/fish-shell/fish-shell/releases/download/%{version}/%{name}-%{version}.tar.xz
-Source1:	vendor.tar.xz
+Source1:	%{name}-%{version}-vendor.tar.xz
 
 BuildRoot:	%{_tmppath}/%{name}-%{version}-%{release}
 BuildRequires:	cmake
-BuildRequires:	gettext
-BuildRequires:	doxygen
+BuildRequires:	ninja
 BuildRequires:	atomic-devel
 BuildRequires:	cargo
+BuildRequires:	doxygen
+BuildRequires:	gettext
+BuildRequires:	gnupg
+BuildRequires:	groff
 BuildRequires:	pkgconfig(ncurses)
 BuildRequires:	pkgconfig(libpcre2-8)
 BuildRequires:	pkgconfig(python)
+BuildRequires:	python%{pyver}dist(sphinx)
+BuildRequires:	rust-packaging
 %if %{with tests}
+BuildRequires:	python%{pyver}dist(pexpect)
 # tests/checks/jobs.fish requires bg and fg provided by bash/sh
 # and tools from coreutils
 BuildRequires:	bash
@@ -35,10 +41,13 @@ BuildRequires:	less
 BuildRequires:	locales
 BuildRequires:	locales-en
 BuildRequires:	locales-fr
+BuildRequires:	locales-extra-charsets
 # tests/check/jobs.fish requires ps from procps-ng
 BuildRequires:	procps-ng
 BuildRequires:	tmux
 %endif
+# Needed to get terminfo
+Requires:	ncurses
 # tab completion wants man-db
 Recommends:	man-db
 Recommends:	man-pages
@@ -70,24 +79,36 @@ EOF
 # make a build dir to build out of source
 mkdir -p build/
 
-# NOTE Remove flaky tests, these run successfully in local builds but fail on
+# NOTE Remove flaky tests, these mostly run successfully in local builds but fail on
 # NOTE the ABF, possibly due to the terminal emulation type used in our build
 # NOTE environment.
 # NOTE Upstream appear to be revising their testing set up to more universally
 # NOTE support CI type environments, this may need a revisit for the next
-# NOTE release of fish (> 4.0.2).
-rm -f tests/checks/jobs.fish
-rm -f tests/checks/string.fish
-rm -f tests/checks/tmux-multiline-prompt.fish
+# NOTE release of fish (> 4.2.1).
+# in 4.2.1 the new man.fish test is flaky, the `man fish` pages all display normally
+# both in fish and bash shells in post install manual testing - disable this test by removing it.
+rm -f tests/checks/man.fish
 
+# Change the bundled scripts to invoke the python binary directly.
+for f in $(find share/tools -type f -name '*.py'); do
+    sed -i -e '1{s@^#!.*@#!%{__python3}@}' "$f"
+done
 
 %build
-cmake -E env CXXFLAGS="-Wno-narrowing" \
+export CARGO_NET_OFFLINE=true
 cmake -B ./build \
 	-DCMAKE_INSTALL_PREFIX=%{_prefix} \
 	-DCMAKE_INSTALL_SYSCONFDIR=%{_sysconfdir} \
+	-DCMAKE_BUILD_TYPE=RelWithDebInfo \
+	-DBUILD_DOCS=ON \
+	-Dextra_completionsdir=%{_datadir}/%{name}/vendor_completions.d \
+	-Dextra_functionsdir=%{_datadir}/%{name}/vendor_functions.d \
+	-Dextra_confdir=%{_datadir}/%{name}/vendor_conf.d \
 	-G Ninja
 %ninja_build -C build
+
+%cargo_license_summary
+%{cargo_license} > LICENSES.dependencies
 
 %install
 %ninja_install -C build -v
@@ -96,30 +117,38 @@ cmake -B ./build \
 cp -a README.rst %{buildroot}%{_docdir}
 cp -a CONTRIBUTING.rst %{buildroot}%{_docdir}
 
-#find_lang %{name}
-
 %if %{with tests}
 %check
+export CI=1
 %ninja -C build fish_run_tests -v
 %endif
 
 %post
-/usr/share/rpm-helper/add-shell %name $1 %{_bindir}/fish
+if [ "$1" = 1 ]; then
+  if [ ! -f %{_sysconfdir}/shells ] ; then
+    echo "%{_bindir}/fish" > %{_sysconfdir}/shells
+    echo "/bin/fish" >> %{_sysconfdir}/shells
+  else
+    grep -q "^%{_bindir}/fish$" %{_sysconfdir}/shells || echo "%{_bindir}/fish" >> %{_sysconfdir}/shells
+    grep -q "^/bin/fish$" %{_sysconfdir}/shells || echo "/bin/fish" >> %{_sysconfdir}/shells
+  fi
+fi
 
 %postun
-/usr/share/rpm-helper/del-shell %name $1 %{_bindir}/fish
+if [ "$1" = 0 ] && [ -f %{_sysconfdir}/shells ] ; then
+  sed -i '\!^%{_bindir}/fish$!d' %{_sysconfdir}/shells
+  sed -i '\!^/bin/fish$!d' %{_sysconfdir}/shells
+fi
 
-%files 
-#-f %{name}.lang
+%files
 %defattr(-,root,root,-)
 %license COPYING
+%license LICENSES.dependencies
 %{_mandir}/man1/fish*.1*
 %{_bindir}/fish*
 %config(noreplace) %{_sysconfdir}/fish/
 %{_datadir}/fish/
 %{_datadir}/pkgconfig/fish.pc
-#{_datadir}/applications/fish.desktop
-#{_datadir}/pixmaps/fish.png
 %{_docdir}
 
 
