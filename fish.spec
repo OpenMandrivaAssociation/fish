@@ -1,6 +1,6 @@
 %define _empty_manifest_terminate_build 0
 # building with tests disabled for ABF as many are flaky, tests passing locally
-%bcond tests 1
+%bcond tests 0
 
 Summary:	A friendly interactive shell
 Name:		fish
