@@ -1,10 +1,10 @@
 %define _empty_manifest_terminate_build 0
 # building with tests disabled for ABF as many are flaky, tests passing locally
-%bcond_with tests
+%bcond tests 1
 
 Summary:	A friendly interactive shell
 Name:		fish
-Version:	4.2.1
+Version:	4.3.1
 Release:	1
 License:	GPLv2 and BSD and ISC and LGPLv2+ and MIT
 Group:		Shells
@@ -84,14 +84,14 @@ mkdir -p build/
 # NOTE environment.
 # NOTE Upstream appear to be revising their testing set up to more universally
 # NOTE support CI type environments, this may need a revisit for the next
-# NOTE release of fish (> 4.2.1).
-# in 4.2.1 the new man.fish test is flaky, the `man fish` pages all display normally
+# NOTE release of fish (> 4.3.1).
+# in 4.3.1 the man.fish test is flaky, the `man fish` pages all display normally
 # both in fish and bash shells in post install manual testing - disable this test by removing it.
 rm -f tests/checks/man.fish
 
 # Change the bundled scripts to invoke the python binary directly.
 for f in $(find share/tools -type f -name '*.py'); do
-    sed -i -e '1{s@^#!.*@#!%{__python3}@}' "$f"
+    sed -i -e '1{s@^#!.*@#!%{__python}@}' "$f"
 done
 
 %build
@@ -100,7 +100,7 @@ cmake -B ./build \
 	-DCMAKE_INSTALL_PREFIX=%{_prefix} \
 	-DCMAKE_INSTALL_SYSCONFDIR=%{_sysconfdir} \
 	-DCMAKE_BUILD_TYPE=RelWithDebInfo \
-	-DBUILD_DOCS=ON \
+	-DWITH_DOCS=ON \
 	-Dextra_completionsdir=%{_datadir}/%{name}/vendor_completions.d \
 	-Dextra_functionsdir=%{_datadir}/%{name}/vendor_functions.d \
 	-Dextra_confdir=%{_datadir}/%{name}/vendor_conf.d \
@@ -111,11 +111,15 @@ cmake -B ./build \
 %{cargo_license} > LICENSES.dependencies
 
 %install
-%ninja_install -C build -v
+%ninja_install -C build
 
 # Install docs from tarball root
-cp -a README.rst %{buildroot}%{_docdir}
-cp -a CONTRIBUTING.rst %{buildroot}%{_docdir}
+cp -a README.rst %{buildroot}%{_docdir}/fish
+cp -a CONTRIBUTING.rst %{buildroot}%{_docdir}/fish
+
+# Remove build artifacts from buildroot
+rm %{buildroot}/%{_docdir}/fish/.buildinfo
+rm %{buildroot}/%{_datadir}/fish/completions/..fish
 
 %if %{with tests}
 %check
@@ -141,68 +145,11 @@ if [ "$1" = 0 ] && [ -f %{_sysconfdir}/shells ] ; then
 fi
 
 %files
-%defattr(-,root,root,-)
-%license COPYING
-%license LICENSES.dependencies
-%{_mandir}/man1/fish*.1*
+%license COPYING LICENSES.dependencies
 %{_bindir}/fish*
-%config(noreplace) %{_sysconfdir}/fish/
+%{_docdir}/fish/
 %{_datadir}/fish/
 %{_datadir}/pkgconfig/fish.pc
-%{_docdir}
+%{_mandir}/man1/fish*.1*
+%config(noreplace) %{_sysconfdir}/fish/
 
-
-%changelog
-* Thu Feb 03 2011 Funda Wang <fwang@mandriva.org> 1.23.1-2mdv2011.0
-+ Revision: 635425
-- do not build bundled xsel
-
-* Mon Mar 08 2010 Sandro Cazzaniga <kharec@mandriva.org> 1.23.1-1mdv2011.0
-+ Revision: 515786
-- fix file list
-- use configure2_5x
-- update to 1.23.1
-
-* Fri Feb 19 2010 Sandro Cazzaniga <kharec@mandriva.org> 1.23.0-3mdv2010.1
-+ Revision: 507983
-- fix URL, SOURCE, Licence
-
-* Thu Sep 10 2009 Thierry Vignaud <tv@mandriva.org> 1.23.0-2mdv2010.0
-+ Revision: 437549
-- rebuild
-
-* Sun Jan 04 2009 Jérôme Soyer <saispo@mandriva.org> 1.23.0-1mdv2009.1
-+ Revision: 324643
-- New upstream release
-
-* Fri Dec 21 2007 Olivier Blin <oblin@mandriva.com> 1.22.3-1mdv2008.1
-+ Revision: 136415
-- restore BuildRoot
-
-  + Thierry Vignaud <tv@mandriva.org>
-    - kill re-definition of %%buildroot on Pixel's request
-    - do not package big ChangeLog
-
-* Thu May 03 2007 Michael Scherer <misc@mandriva.org> 1.22.3-1mdv2008.0
-+ Revision: 20938
-- update to 1.22.3
-- Import fish
-
-* Sun Apr 30 2006 Michael Scherer <misc@mandriva.org> 1.21.5-1mdk
-- New release 1.21.5
-
-* Mon Apr 10 2006 Michael Scherer <misc@mandriva.org> 1.21.3-1mdk
-- New release 1.21.3
-
-* Mon Feb 27 2006 Michael Scherer <misc@mandriva.org> 1.21.1-1mdk
-- New release 1.21.1
-
-* Tue Jan 31 2006 Michael Scherer <misc@mandriva.org> 1.20.1-1mdk
-- New release 1.20.1
-
-* Tue Jan 17 2006 Michael Scherer <misc@mandriva.org> 1.19.0-1mdk
-- New release 1.19.0
-
-* Tue Dec 20 2005 Michael Scherer <misc@mandriva.org> 1.18.2-1mdk
-- first mandriva package, upon rgs request ( happy christmas to you ),
-  based on Axel Liljencrantz <axel@liljencrantz.se> spec.
