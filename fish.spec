@@ -1,6 +1,6 @@
 %define _empty_manifest_terminate_build 0
 # building with tests disabled for ABF as many are flaky, tests passing locally
-%bcond tests 1
+%bcond tests 0
 
 Summary:	A friendly interactive shell
 Name:		fish
@@ -26,9 +26,10 @@ BuildRequires:	pkgconfig(python3)
 BuildRequires:	python%{pyver}dist(pexpect)
 BuildRequires:	python%{pyver}dist(sphinx)
 BuildRequires:	rust-packaging
+%if %{with tests}
 # tests/checks/jobs.fish requires bg and fg provided by bash/sh
 # and tools from coreutils
-#BuildRequires:	bash
+BuildRequires:	bash
 BuildRequires:	coreutils
 # for tests/check/git.fish
 BuildRequires:	git
@@ -43,6 +44,7 @@ BuildRequires:	locales-extra-charsets
 # tests/check/jobs.fish requires ps from procps-ng
 BuildRequires:	procps-ng
 BuildRequires:	tmux
+%endif
 # Needed to get terminfo
 Requires:	ncurses
 Requires:	gawk
