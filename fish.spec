@@ -1,10 +1,10 @@
 %define _empty_manifest_terminate_build 0
 # building with tests disabled for ABF as many are flaky, tests passing locally
-%bcond tests 0
+%bcond tests 1
 
 Summary:	A friendly interactive shell
 Name:		fish
-Version:	4.3.3
+Version:	4.4.0
 Release:	1
 License:	GPLv2 and BSD and ISC and LGPLv2+ and MIT
 Group:		Shells
@@ -12,7 +12,6 @@ URL:		https://github.com/fish-shell/fish-shell/
 Source0:	https://github.com/fish-shell/fish-shell/releases/download/%{version}/%{name}-%{version}.tar.xz
 Source1:	%{name}-%{version}-vendor.tar.xz
 
-BuildRoot:	%{_tmppath}/%{name}-%{version}-%{release}
 BuildRequires:	cmake
 BuildRequires:	ninja
 BuildRequires:	atomic-devel
@@ -23,14 +22,13 @@ BuildRequires:	gnupg
 BuildRequires:	groff
 BuildRequires:	pkgconfig(ncurses)
 BuildRequires:	pkgconfig(libpcre2-8)
-BuildRequires:	pkgconfig(python)
+BuildRequires:	pkgconfig(python3)
+BuildRequires:	python%{pyver}dist(pexpect)
 BuildRequires:	python%{pyver}dist(sphinx)
 BuildRequires:	rust-packaging
-%if %{with tests}
-BuildRequires:	python%{pyver}dist(pexpect)
 # tests/checks/jobs.fish requires bg and fg provided by bash/sh
 # and tools from coreutils
-BuildRequires:	bash
+#BuildRequires:	bash
 BuildRequires:	coreutils
 # for tests/check/git.fish
 BuildRequires:	git
@@ -45,9 +43,12 @@ BuildRequires:	locales-extra-charsets
 # tests/check/jobs.fish requires ps from procps-ng
 BuildRequires:	procps-ng
 BuildRequires:	tmux
-%endif
 # Needed to get terminfo
 Requires:	ncurses
+Requires:	gawk
+Requires:	bc
+Requires:	gzip
+
 # tab completion wants man-db
 Recommends:	man-db
 Recommends:	man-pages
@@ -58,6 +59,13 @@ fish is a fully-equipped command line shell (like bash or zsh) that is
 smart and user-friendly. fish supports powerful features like syntax
 highlighting, autosuggestions, and tab completions that just work, with
 nothing to learn or configure.
+
+%package devel
+Summary:	Development files for the fish shell
+Group:		Development/Libraries/C and C++
+
+%description devel
+This package contains development files for the fish shell.
 
 %prep
 %setup -q
@@ -91,7 +99,7 @@ rm -f tests/checks/man.fish
 
 # Change the bundled scripts to invoke the python binary directly.
 for f in $(find share/tools -type f -name '*.py'); do
-    sed -i -e '1{s@^#!.*@#!%{__python}@}' "$f"
+    sed -i -e '1{s@^#!.*@#!%{__python3}@}' "$f"
 done
 
 %build
@@ -100,6 +108,7 @@ cmake -B ./build \
 	-DCMAKE_INSTALL_PREFIX=%{_prefix} \
 	-DCMAKE_INSTALL_SYSCONFDIR=%{_sysconfdir} \
 	-DCMAKE_BUILD_TYPE=RelWithDebInfo \
+	-DWITH_MESSAGE_LOCALIZATION=ON \
 	-DWITH_DOCS=ON \
 	-Dextra_completionsdir=%{_datadir}/%{name}/vendor_completions.d \
 	-Dextra_functionsdir=%{_datadir}/%{name}/vendor_functions.d \
@@ -118,8 +127,8 @@ cp -a README.rst %{buildroot}%{_docdir}/fish
 cp -a CONTRIBUTING.rst %{buildroot}%{_docdir}/fish
 
 # Remove build artifacts from buildroot
-rm %{buildroot}/%{_docdir}/fish/.buildinfo
-rm %{buildroot}/%{_datadir}/fish/completions/..fish
+rm -fv %{buildroot}/%{_docdir}/fish/.buildinfo
+rm -fv %{buildroot}/%{_datadir}/fish/completions/..fish
 
 %if %{with tests}
 %check
@@ -149,7 +158,9 @@ fi
 %{_bindir}/fish*
 %{_docdir}/fish/
 %{_datadir}/fish/
-%{_datadir}/pkgconfig/fish.pc
 %{_mandir}/man1/fish*.1*
 %config(noreplace) %{_sysconfdir}/fish/
 
+%files devel
+%license COPYING
+%{_datadir}/pkgconfig/fish.pc
