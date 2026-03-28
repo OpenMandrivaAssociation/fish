@@ -4,7 +4,7 @@
 
 Summary:	A friendly interactive shell
 Name:		fish
-Version:	4.5.0
+Version:	4.6.0
 Release:	1
 License:	GPLv2 and BSD and ISC and LGPLv2+ and MIT
 Group:		Shells
@@ -12,14 +12,14 @@ URL:		https://github.com/fish-shell/fish-shell/
 Source0:	https://github.com/fish-shell/fish-shell/releases/download/%{version}/%{name}-%{version}.tar.xz
 Source1:	%{name}-%{version}-vendor.tar.xz
 
-BuildRequires:	cmake
-BuildRequires:	ninja
 BuildRequires:	atomic-devel
 BuildRequires:	cargo
+BuildRequires:	cmake
 BuildRequires:	doxygen
 BuildRequires:	gettext
 BuildRequires:	gnupg
 BuildRequires:	groff
+BuildRequires:	ninja
 BuildRequires:	pkgconfig(ncurses)
 BuildRequires:	pkgconfig(libpcre2-8)
 BuildRequires:	pkgconfig(python3)
@@ -46,15 +46,15 @@ BuildRequires:	procps-ng
 BuildRequires:	tmux
 %endif
 # Needed to get terminfo
-Requires:	ncurses
-Requires:	gawk
 Requires:	bc
+Requires:	gawk
 Requires:	gzip
+Requires:	ncurses
 
 # tab completion wants man-db
+Recommends:	groff-base
 Recommends:	man-db
 Recommends:	man-pages
-Recommends:	groff-base
 
 %description
 fish is a fully-equipped command line shell (like bash or zsh) that is
@@ -157,11 +157,13 @@ fi
 
 %files
 %license COPYING LICENSES.dependencies
-%{_bindir}/fish*
-%{_docdir}/fish/
-%{_datadir}/fish/
-%{_mandir}/man1/fish*.1*
-%config(noreplace) %{_sysconfdir}/fish/
+%{_bindir}/%{name}
+%{_bindir}/%{name}_indent
+%{_bindir}/%{name}_key_reader
+%{_docdir}/%{name}/
+%{_datadir}/%{name}/
+%{_mandir}/man1/%{name}*.1*
+%config(noreplace) %{_sysconfdir}/%{name}/
 
 %files devel
 %license COPYING
