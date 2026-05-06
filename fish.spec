@@ -4,12 +4,12 @@
 
 Summary:	A friendly interactive shell
 Name:		fish
-Version:	4.6.0
+Version:	4.7.0
 Release:	1
 License:	GPLv2 and BSD and ISC and LGPLv2+ and MIT
 Group:		Shells
 URL:		https://github.com/fish-shell/fish-shell/
-Source0:	https://github.com/fish-shell/fish-shell/releases/download/%{version}/%{name}-%{version}.tar.xz
+Source0:	https://github.com/fish-shell/fish-shell/archive/%{version}/%{name}-%{version}.tar.gz
 Source1:	%{name}-%{version}-vendor.tar.xz
 
 BuildRequires:	atomic-devel
@@ -70,9 +70,10 @@ Group:		Development/Libraries/C and C++
 This package contains development files for the fish shell.
 
 %prep
-%setup -q
+%autosetup -p1 -n %{name}-shell-%{version}
 tar -zxf %{SOURCE1}
 mkdir -p .cargo
+
 cat >> .cargo/config.toml << EOF
 [source.crates-io]
 replace-with = "vendored-sources"
